@@ -1,12 +1,17 @@
+import random
+
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import render, get_object_or_404
-from django.urls import reverse_lazy
+from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView, UpdateView, ListView
 
+from users.forms import UserRegisterForm, UserForm
 from users.models import User
 from django.contrib.auth.views import LoginView as BaseLoginView
 from django.contrib.auth.views import LogoutView as BaseLogoutView
+
+from users.services import send_new_password, send_verify_email
 
 
 class ManagerRequiredMixin(PermissionRequiredMixin):
