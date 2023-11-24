@@ -38,6 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'well',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -118,12 +121,9 @@ STATIC_URL = 'static/'
 
 ENV_TYPE = os.getenv('ENV_TYPE')
 
-if ENV_TYPE == 'local':
-    STATICFILES_DIRS = (
-        BASE_DIR / 'static',
-    )
-else:
-    STATIC_ROOT = BASE_DIR / 'static'
+STATICFILES_DIRS = (
+    BASE_DIR / 'static',
+)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -139,3 +139,8 @@ EMAIL_PORT = 465
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_USE_SSL = True
+
+LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/'
+
+LOGIN_URL = '/users/'
