@@ -12,6 +12,7 @@ def send_new_password(email, new_password):
         recipient_list=[email],
     )
 
+
 def send_verify_email(request, verification_token, email):
     """Верификация почты"""
     send_mail(

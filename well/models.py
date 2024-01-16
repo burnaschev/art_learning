@@ -25,8 +25,6 @@ class Lesson(models.Model):
     video_url = models.URLField(verbose_name='ссылка на видео', **NULLABLE)
     well = models.ForeignKey(Well, on_delete=models.CASCADE, verbose_name='курс', **NULLABLE,
                              related_name='lessons')
-    users = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, **NULLABLE, verbose_name='Пользователь')
 
     def __str__(self):
         return f"{self.title}"
