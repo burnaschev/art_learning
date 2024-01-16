@@ -1,0 +1,58 @@
+{% extends 'well/base.html' %}
+
+{% block content %}
+    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+        <h1 class="display-4">Сервис рассылок</h1>
+    </div>
+    <div class="row text-center">
+        <div class="col-12">
+            <div class="col-12">
+                {% if user.is_staff or user.is_superuser %}
+                    <a class='btn btn-primary' href="{% url 'well:well-create' %}">Добавить курс</a>
+                {% endif %}
+            </div>
+        </div>
+        {% for object in object_list %}
+            <div class="p-3 col-3">
+                <div class="card mb-4 box-shadow">
+                    <div class="card-header">
+                        <h4 class="my-0 font-weight-normal">{{ object.title }}</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mt-3 mb-4 text-start m-3">
+                            <li>{{ object.documentation|truncatechars:30 }}</li>
+                        </ul>
+                        <div class="btn-group ml-4">
+                            {% if user.is_staff or user.is_superuser %}
+                                <a class="p-2 btn btn-outline-primary"
+                                   href="{% url 'well:well-update' object.pk %}">Изменение</a>
+                            {% endif %}
+                            <a class="p-2 btn btn-outline-danger"
+                               href="{% url 'well:well-view' object.pk %}">Просмотр</a>
+                            {% if user.is_staff or user.is_superuser %}
+                                <a class="p-2 btn btn-outline-danger"
+                                   href="{% url 'well:well-delete' object.pk %}">Удаление</a>
+                            {% endif %}
+                        </div>
+                        <div class="btn-group ml-4">
+                            {#                            {% if not user.is_staff or user.is_superuser %}#}
+                            {#                                <a class="p-2 btn btn-outline-success mt-2"#}
+                            {#                                   href="{% url 'mailing:mailing_clients' object.pk %}">Клиенты</a>#}
+                            {#                            {% endif %}#}
+                            {#                            {% if user.is_staff%}#}
+                            {#                                {% if object.status == object.STARTED %}#}
+                            {#                                    <a class="p-2 btn btn-outline-success mt-2"#}
+                            {#                                       href="{% url 'mailing:stop_mailing' object.pk %}">Остановить рассылку</a>#}
+                            {#                                {% else %}#}
+                            {#                                    <a class="p-2 btn btn-outline-success mt-2"#}
+                            {#                                       href="{% url 'mailing:stop_mailing' object.pk %}">Запустить рассылку</a>#}
+                            {#                                {% endif %}#}
+                            {#                            {% endif %}#}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}

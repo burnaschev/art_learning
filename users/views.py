@@ -1,24 +1,13 @@
 import random
 
-from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.core.exceptions import PermissionDenied
-from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse_lazy, reverse
+from django.contrib.auth.views import LoginView as BaseLoginView
+from django.contrib.auth.views import LogoutView as BaseLogoutView
+from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, ListView
 
 from users.forms import UserRegisterForm, UserForm
 from users.models import User
-from django.contrib.auth.views import LoginView as BaseLoginView
-from django.contrib.auth.views import LogoutView as BaseLogoutView
-
-from users.services import send_new_password, send_verify_email
-
-
-class ManagerRequiredMixin(PermissionRequiredMixin):
-    permission_required = 'users.manager_access'
-
-    def handle_no_permission(self):
-        raise PermissionDenied
+from users.services import send_verify_email
 
 
 class LoginView(BaseLoginView):
@@ -28,7 +17,7 @@ class LoginView(BaseLoginView):
 class LogoutView(BaseLogoutView):
 
     def get_success_url(self):
-        return reverse_lazy('mailing:list')
+        return reverse_lazy("well:home")
 
 
 class RegisterView(CreateView):
@@ -37,28 +26,12 @@ class RegisterView(CreateView):
     success_url = reverse_lazy('users:login')
     template_name = 'users/register.html'
 
-    def form_valid(self, form):
-        new_user = form.save(commit=False)
-        new_user.verification_token = ''.join([str(random.randint(0, 9)) for _ in range(12)])
-        new_user.save()
-        send_verify_email(self.request, new_user.verification_token, new_user.email)
-        return super().form_valid(form)
-
-
-def verify_email(request, token):
-    user = get_object_or_404(User, verification_token=token)
-    if not user.email_verified:
-        user.email_verified = True
-        user.save()
-
-    return render(request, 'users/verification_success.html')
-
-
-def verify_email_btn(request, pk):
-    user = get_object_or_404(User, pk=pk)
-    send_verify_email(request, user.verification_token, user.email)
-
-    return render(request, 'mailing/verification_failed.html')
+    # def form_valid(self, form):
+    #     new_user = form.save(commit=False)
+    #     new_user.verification_token = ''.join([str(random.randint(0, 9)) for _ in range(12)])
+    #     new_user.save()
+    #     send_verify_email(self.request, new_user.verification_token, new_user.email)
+    #     return super().form_valid(form)
 
 
 class UserUpdateView(UpdateView):
@@ -71,19 +44,5 @@ class UserUpdateView(UpdateView):
         return self.request.user
 
 
-class UserListView(ListView, ManagerRequiredMixin):
+class UserListView(ListView):
     model = User
-
-    def get_queryset(self):
-        if self.request.user.groups.filter(name="manager").exists() or self.request.user.is_superuser:
-            return User.objects.filter(is_staff=False, is_superuser=False)
-        else:
-            raise PermissionDenied('Доступ запрещен')
-
-
-def generate_new_password(request):
-    new_password = ''.join([str(random.randint(0, 9)) for _ in range(12)])
-    send_new_password(request.user.email, new_password)
-    request.user.set_password(new_password)
-    request.user.save()
-    return redirect(reverse('mailing:home'))
